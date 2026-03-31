@@ -1,6 +1,6 @@
 # ⏱ Clockify → Google Sheets
 
-Skrypt Google Apps Script, który automatycznie pobiera wpisy czasu z Clockify i generuje raport godzinowy w Google Sheets — zgodny z firmowym szablonem rozliczeniowym.
+Skrypt Google Apps Script, który automatycznie pobiera wpisy czasu z Clockify i generuje raport godzinowy w Google Sheets — zgodny z szablonem rozliczeniowym. Przygotowany pod rozliczenia z Allegro.
 
 ---
 
