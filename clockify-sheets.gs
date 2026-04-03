@@ -57,6 +57,30 @@ function fetchCurrentMonth() {
 }
 
 // ============================================
+// FETCH PREVIOUS MONTH
+// ============================================
+function fetchPreviousMonth() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+
+  // Build UTC strings explicitly to avoid timezone shifting
+  const startISO = `${year}-${String(month).padStart(2, "0")}-01T00:00:00Z`;
+
+  // Last day of current month
+  const lastDay = new Date(year, month, 0).getDate();
+  const endISO = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}T23:59:59Z`;
+
+  const label = Utilities.formatDate(
+    new Date(year, month, 1),
+    Session.getScriptTimeZone(),
+    "MMMM yyyy",
+  );
+
+  importEntries(startISO, endISO, label);
+}
+
+// ============================================
 // FETCH BY DATE RANGE
 // ============================================
 function fetchByDateRange() {
@@ -313,6 +337,7 @@ function callClockify(url) {
     muteHttpExceptions: true,
   };
   const response = UrlFetchApp.fetch(url, options);
+
   if (response.getResponseCode() !== 200) {
     throw new Error(
       `Clockify API error (${response.getResponseCode()}): ${response.getContentText()}`,
@@ -346,6 +371,14 @@ function getOrCreateSheet(name) {
   return sheet;
 }
 
+function getMyUserId() {
+  const response = callClockify(`${BASE_URL}/user`);
+  const user = JSON.parse(response.getContentText());
+  const u2 = JSON.stringify(user);
+  SpreadsheetApp.getUi().alert(`Your User ID: ${user.id}\nName: ${user.name}\nWorkspace: ${user.activeWorkspace}\nDefault Workspace: ${user.defaultWorkspace}`);
+}
+
+
 // ============================================
 // CUSTOM MENU
 // ============================================
@@ -353,6 +386,8 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu("⏱ Clockify")
     .addItem("Fetch Current Month", "fetchCurrentMonth")
+    .addItem("Fetch Previous Month", "fetchPreviousMonth")
     .addItem("Fetch by Date Range", "fetchByDateRange")
+    .addItem("Get User ID", "getMyUserId")
     .addToUi();
 }
