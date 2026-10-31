@@ -9,13 +9,13 @@ const CONFIG = {
   API_KEY: "",
   WORKSPACE_ID: "",
   USER_ID: "",
-  SHEET_NAME: `${year}-${String(now.getMonth() + 1).padStart(2, '0')}`,
+  SHEET_NAME: `${year}-${String(now.getMonth() + 1).padStart(2, '0')}`, // Sheet name has date in yyyy-MM format, e.g. 2026-11, change it to your preference
   PAGE_SIZE: 200,
 
   // Document fields
   NAME: "",
   POSITION: "",
-  PROJECT: "", // Leave empty to use Clockify project, or set to override, eg. "MarAdTech"
+  PROJECT: "", // Leave empty to use Clockify project, or set to override, e.g. "MarAdTech"
 };
 
 const BASE_URL = "https://api.clockify.me/api/v1";
