@@ -1,17 +1,21 @@
 // ============================================
 // CONFIGURATION — Update these values
 // ============================================
+const now = new Date();
+const year = now.getFullYear();
+const month = now.getMonth();
+
 const CONFIG = {
   API_KEY: "",
   WORKSPACE_ID: "",
   USER_ID: "",
-  SHEET_NAME: "",
+  SHEET_NAME: `${year}-${String(now.getMonth() + 1).padStart(2, '0')}`,
   PAGE_SIZE: 200,
 
   // Document fields
   NAME: "",
   POSITION: "",
-  PROJECT: "", // Leave empty to use Clockify project, or set to override
+  PROJECT: "", // Leave empty to use Clockify project, or set to override, eg. "MarAdTech"
 };
 
 const BASE_URL = "https://api.clockify.me/api/v1";
@@ -36,10 +40,6 @@ const HEADERS = [
 // FETCH CURRENT MONTH
 // ============================================
 function fetchCurrentMonth() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-
   // Build UTC strings explicitly to avoid timezone shifting
   const startISO = `${year}-${String(month + 1).padStart(2, "0")}-01T00:00:00Z`;
 
@@ -155,7 +155,7 @@ function importEntries(startISO, endISO, label) {
         projectName,
         description,
         hours,
-        hours,
+        "",
         "",
       ]);
     } else {
@@ -163,11 +163,6 @@ function importEntries(startISO, endISO, label) {
       dataRows.push(["", specialist, CONFIG.PROJECT || "", "", "", "", ""]);
     }
   }
-
-  // Calculate total hours
-  const totalHours =
-    sortedDates.reduce((sum, d) => sum + dayMap[d].totalSeconds, 0) / 3600;
-  const totalRounded = parseFloat(totalHours.toFixed(2));
 
   // --- WRITE HEADERS (row 5) ---
   const headerRow = TABLE_START_ROW;
@@ -211,8 +206,8 @@ function importEntries(startISO, endISO, label) {
   sumLabelRange.setVerticalAlignment("middle");
 
   // Total hours in column G (col 7) = "Liczba przepracowanych godzin (łącznie)"
-  const sumValueCell = sheet.getRange(sumRow, TABLE_START_COL + 4);
-  sumValueCell.setValue(totalRounded);
+  const sumValueCell = sheet.getRange(sumRow, TABLE_START_COL + 4, 1);
+  sumValueCell.setFormula(`=SUM(G${dataStartRow}:G${sumRow - 1})`);
   sumValueCell.setFontWeight("bold");
   sumValueCell.setHorizontalAlignment("center");
   sumValueCell.setVerticalAlignment("middle");
@@ -266,7 +261,7 @@ function importEntries(startISO, endISO, label) {
   sheet.setRowHeight(headerRow, 80);
 
   SpreadsheetApp.getUi().alert(
-    `Done! Imported ${sortedDates.length} days (${totalRounded}h) for ${label}.`,
+    `Done! Imported ${sortedDates.length} days for ${label}.`,
   );
 }
 
